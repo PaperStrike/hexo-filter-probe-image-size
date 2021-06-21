@@ -23,7 +23,6 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@types/probe-image-size": "^7.0.0",
     "chalk": "^4.1.1",
     "probe-image-size": "^7.2.1",
     "string-replace-async": "^2.0.0"
@@ -31,6 +30,7 @@
   "devDependencies": {
     "@babel/core": "^7.14.6",
     "@babel/eslint-parser": "^7.14.5",
+    "@types/probe-image-size": "^7.0.0",
     "eslint": "^7.29.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.23.4"
