@@ -74,7 +74,7 @@ probe_image_sizes:
 
 ### Proxy fallbacks
 
-For files failed to access in previous proxy, use `https://fallback/`, and if failed again, use the original path:
+For files failed to access in previous proxy, use `/a/path/expected/to/contains/all/images/`, and if failed again, use the original path:
 
 ```yaml
 probe_image_sizes:
