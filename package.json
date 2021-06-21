@@ -2,11 +2,6 @@
   "name": "hexo-filter-probe-image-size",
   "version": "0.1.0",
   "description": "Probe and set image sizes in hexo web pages",
-  "main": "index.js",
-  "scripts": {
-    "lint": "eslint .",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [
     "hexo",
     "hexo-plugin",
@@ -14,15 +9,18 @@
     "width",
     "height"
   ],
-  "author": "PaperStrike",
+  "bugs": "https://github.com/PaperStrike/hexo-filter-probe-image-size/issues",
   "license": "MIT",
+  "author": "PaperStrike",
   "files": [
     "*.config.*",
     ".eslintrc.*"
   ],
-  "engines": {
-    "hexo": "^5.0.0",
-    "node": "^14.15.0 || >=15.0.0"
+  "main": "index.js",
+  "repository": "github:PaperStrike/hexo-filter-probe-image-size",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "@types/probe-image-size": "^7.0.0",
@@ -36,5 +34,9 @@
     "eslint": "^7.29.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.23.4"
+  },
+  "engines": {
+    "hexo": "^5.0.0",
+    "node": "^14.15.0 || >=15.0.0"
   }
 }
