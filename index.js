@@ -23,7 +23,7 @@ const config = {
   priority: 10,
   proxies: [
     {
-      name: 'http-to-local',
+      name: 'HTTP to local',
       match: '^(https?:)?//.+/(?=[^/]+$)',
       target: '/images/',
       external: false,
