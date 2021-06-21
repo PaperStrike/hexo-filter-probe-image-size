@@ -1,5 +1,7 @@
 # hexo-filter-probe-image-size
 
+[![npm package](https://img.shields.io/npm/v/hexo-filter-probe-image-size)](https://www.npmjs.com/package/hexo-filter-probe-image-size)
+
 Probe and set `width` and `height` to `<img>` elements.
 
 As [modern best practice - Optimize Cumulative Layout Shift | web.dev](https://web.dev/optimize-cls/#modern-best-practice) describes, always set the `width` and `height` attributes without units in HTML, and set one of them to `auto` in CSS.
