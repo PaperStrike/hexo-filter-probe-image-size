@@ -80,19 +80,19 @@ probe_image_sizes:
 
 ### Proxy fallbacks
 
-For files failed to access in previous proxy, use `/a/path/expected/to/contains/all/images/`, and if failed again, use the original path:
+For files failed to access in previous proxy, use `/a/path/expected/to/contain/all/images/`, and if failed again, use the original path:
 
 ```yaml
 probe_image_sizes:
   enable: true
   proxies:
-    - name: Example that flat the path
+    - name: Example
       match: ^.+/(?=[^/]+$)
       target: /images/
     # when proxy above failed to target a parsable image.
-    - name: All images
+    - name: All images folder
       match: ^.+/(?=[^/]+$)
-      target: /a/path/expected/to/contains/all/images/
+      target: /a/path/expected/to/contain/all/images/
       external: true
     # Use original image path if all previous ones failed.
     - name: Original
@@ -101,7 +101,7 @@ probe_image_sizes:
       target: ''
 ```
 
-### Runs later than others
+### Run later than others
 
 _See [Filter | Hexo](https://hexo.io/api/filter#Synopsis) for filter priority description._
 
@@ -116,7 +116,7 @@ probe_image_sizes:
 Or manage the order totally on your own.
 
 ```yaml
-some_other_plugin_that_also_supports_priority:
+some_other_filter_that_also_supports_priority:
   priority: 11
 
 probe_image_sizes:
