@@ -15,7 +15,11 @@
     "height"
   ],
   "author": "PaperStrike",
-  "license": "ISC",
+  "license": "MIT",
+  "files": [
+    "*.config.*",
+    ".eslintrc.*"
+  ],
   "engines": {
     "hexo": "^5.0.0",
     "node": "^14.15.0 || >=15.0.0"
