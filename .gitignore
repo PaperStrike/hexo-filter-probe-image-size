@@ -1,0 +1,9 @@
+# Mac and Windows
+.DS_Store
+desktop.ini
+
+# IntelliJ
+.idea/
+
+# Node
+node_modules/
