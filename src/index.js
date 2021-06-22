@@ -4,19 +4,25 @@ const chalk = require('chalk');
 const probe = require('probe-image-size');
 const replaceAsync = require('string-replace-async');
 
+const Attrs = require('./utils/Attrs');
+
 /**
- * @typedef {Object} PathProxy
- * @property {string} name
+ * @typedef {Object} ProxyInit
+ * @property {string} [name]
  * @property {string} match
  * @property {string} target
- * @property {string} external
+ * @property {string} [external]
  */
 
 /**
- * @namespace
+ * @typedef {Object} Config
  * @property {boolean} enable
  * @property {number} priority
- * @property {PathProxy[]} proxies
+ * @property {Array<ProxyInit>} proxies
+ */
+
+/**
+ * @type {Config}
  */
 const config = {
   enable: false,
@@ -36,6 +42,11 @@ const config = {
   hexo.config[hexoConfigKey] = Object.assign(config, hexo.config[hexoConfigKey]);
 }
 
+const proxies = config.proxies.map((proxy) => ({
+  ...proxy,
+  match: new RegExp(proxy.match),
+}));
+
 /**
  * @type {Object<string, Promise<probe.ProbeResult>>}
  */
@@ -47,7 +58,7 @@ const probeResolvedPathPromises = {};
  * @param {boolean} [options.external=false]
  * @return {Promise<probe.ProbeResult>}
  */
-const probeByResolvedPath = async (resolvedPath, { external = false } = {}) => {
+const probeByResolvedPath = (resolvedPath, { external = false } = {}) => {
   if (probeResolvedPathPromises[resolvedPath]) {
     return probeResolvedPathPromises[resolvedPath];
   }
@@ -90,18 +101,18 @@ const probeByElementSRC = (src) => {
 
   let probePromise;
   {
-    const proxies = config.proxies.filter((proxy) => new RegExp(proxy.match).test(src));
+    const matchedProxies = proxies.filter((proxy) => proxy.match.test(src));
 
-    if (proxies.length === 0) {
+    if (matchedProxies.length === 0) {
       probePromise = probeByResolvedPath(src);
     } else {
-      probePromise = proxies
-        .reduce((promise, proxy) => {
-          const resolvedPath = src.replace(new RegExp(proxy.match), proxy.target);
-          return promise.catch(() => (
-            probeByResolvedPath(resolvedPath, { external: proxy.external })
-          ));
-        }, Promise.reject());
+      probePromise = matchedProxies
+        .reduce((promise, proxy) => (
+          promise.catch(() => {
+            const resolvedPath = src.replace(proxy.match, proxy.target);
+            return probeByResolvedPath(resolvedPath, { external: proxy.external });
+          })
+        ), Promise.reject());
     }
   }
 
@@ -109,42 +120,17 @@ const probeByElementSRC = (src) => {
   return probePromise;
 };
 
-class Attrs {
-  /**
-   * @param {string} stringAttrs
-   */
-  constructor(stringAttrs) {
-    [...stringAttrs.matchAll(/(?<=\s*)([^\s=]+)(?:="([^"]*)")?/g)]
-      .forEach(([, name, value]) => {
-        this[name.toLowerCase()] = value;
-      });
-  }
-
-  toString() {
-    return Object.getOwnPropertyNames(this)
-      .map((name) => {
-        const value = this[name];
-        return ` ${name}${value === undefined ? '' : `="${value}"`}`;
-      })
-      .join('');
-  }
-}
-
 const getSizedStringAttrs = async (stringAttrs) => {
   const attrs = new Attrs(stringAttrs);
+  const { src } = attrs;
 
-  if (!('src' in attrs) || 'loading' in attrs) return stringAttrs;
+  if (!src || 'width' in attrs || 'height' in attrs) return stringAttrs;
 
-  if (!('width' in attrs) && !('height' in attrs)) {
-    const { src } = attrs;
-    if (src) {
-      const size = await probeByElementSRC(src).catch(() => null);
-      if (size) {
-        attrs.width = size.width;
-        attrs.height = size.height;
-      }
-    }
-  }
+  const size = await probeByElementSRC(src).catch(() => null);
+  if (!size) return stringAttrs;
+
+  attrs.width = size.width;
+  attrs.height = size.height;
 
   return attrs.toString();
 };
