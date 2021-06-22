@@ -4,6 +4,8 @@ const chalk = require('chalk');
 const probe = require('probe-image-size');
 const replaceAsync = require('string-replace-async');
 
+const Attrs = require('./utils/Attrs');
+
 /**
  * @typedef {Object} PathProxy
  * @property {string} [name]
@@ -108,27 +110,6 @@ const probeByElementSRC = (src) => {
   probeSRCPromises[src] = probePromise;
   return probePromise;
 };
-
-class Attrs {
-  /**
-   * @param {string} stringAttrs
-   */
-  constructor(stringAttrs) {
-    [...stringAttrs.matchAll(/(?<=\s*)([^\s=]+)(?:="([^"]*)")?/g)]
-      .forEach(([, name, value]) => {
-        this[name.toLowerCase()] = value;
-      });
-  }
-
-  toString() {
-    return Object.getOwnPropertyNames(this)
-      .map((name) => {
-        const value = this[name];
-        return ` ${name}${value === undefined ? '' : `="${value}"`}`;
-      })
-      .join('');
-  }
-}
 
 const getSizedStringAttrs = async (stringAttrs) => {
   const attrs = new Attrs(stringAttrs);
