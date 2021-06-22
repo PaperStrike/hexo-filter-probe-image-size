@@ -38,7 +38,7 @@ const config = {
 };
 
 {
-  const hexoConfigKey = 'probe_image_sizes';
+  const hexoConfigKey = 'probe_image_size';
   hexo.config[hexoConfigKey] = Object.assign(config, hexo.config[hexoConfigKey]);
 }
 

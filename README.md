@@ -18,7 +18,7 @@ All absolute paths represent files from the file system. E.g., `/home/foo/Pictur
 
 ```yaml
 # Probe <img> sizes and set related attributes.
-probe_image_sizes:
+probe_image_size:
 
   enable: false
 
@@ -50,7 +50,7 @@ probe_image_sizes:
 For files in my own image CDN `https://example/img/`, use `/home/demo/Pictures/`:
 
 ```yaml
-probe_image_sizes:
+probe_image_size:
   enable: true
   proxies:
     - name: My CDN
@@ -63,7 +63,7 @@ probe_image_sizes:
 For files with a name prefixed by `Primo-`, use `/home/demo/Primo/pics/`:
 
 ```yaml
-probe_image_sizes:
+probe_image_size:
   enable: true
   proxies:
     - name: El Primo
@@ -76,7 +76,7 @@ probe_image_sizes:
 For files failed to access in previous proxy, use `/a/path/expected/to/contain/all/images/`, and if failed again, use the original path:
 
 ```yaml
-probe_image_sizes:
+probe_image_size:
   enable: true
   proxies:
     - name: Example
@@ -100,7 +100,7 @@ _See [Filter | Hexo](https://hexo.io/api/filter#Synopsis) for filter priority de
 As most of Hexo filters use a priority of 10, setting it to 9 or 11 makes our probe process runs earlier or later than them.
 
 ```yaml
-probe_image_sizes:
+probe_image_size:
   enable: true
   priority: 11
 ```
@@ -111,7 +111,7 @@ Or manage the order totally on your own.
 some_other_filter_that_also_supports_priority:
   priority: 11
 
-probe_image_sizes:
+probe_image_size:
   enable: true
   priority: 12
 ```
