@@ -30,6 +30,7 @@
   "devDependencies": {
     "@babel/core": "^7.14.6",
     "@babel/eslint-parser": "^7.14.5",
+    "@types/hexo": "^3.8.5",
     "@types/probe-image-size": "^7.0.0",
     "eslint": "^7.29.0",
     "eslint-config-airbnb-base": "^14.2.1",
