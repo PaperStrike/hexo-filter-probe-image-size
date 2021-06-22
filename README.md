@@ -12,7 +12,9 @@ As [modern best practice - Optimize Cumulative Layout Shift | web.dev](https://w
 
 Available configurations and default values. Configure them in Hexo `_config.yml`.
 
-All paths, if not marked `external`, base on the generating folder (usually the `public` folder after generated).
+All relative paths, relative and limited to the generating folder (usually the `public` folder after generated).
+
+All absolute paths represent files from the file system. E.g., `/home/foo/Pictures/` does represent `/home/foo/Pictures/` on Linux, and `D:/home/foo/Pictures/` on Windows (assume you run Hexo in `D:`), instead of the one based on your site folder.
 
 ```yaml
 # Probe <img> sizes and set related attributes.
@@ -39,15 +41,7 @@ probe_image_sizes:
       # The string that replaces the substring
       # specified by the specified RegExp.
       # Based on the generating folder.
-      target: /images/
-
-      # Make the resolved path base on the file system,
-      # to probe image sizes by using files outside.
-      # Not used if resolving to HTTP URLs.
-      # E.g., when targeting /home/foo/Pictures/ (on Linux)
-      # or D:/Pictures/ (on Windows).
-      # Optional, default to false
-      external: false
+      target: images/
 ```
 
 ## Examples
@@ -63,7 +57,6 @@ probe_image_sizes:
     - name: My CDN
       match: ^https://example/img/
       target: /home/demo/Pictures/
-      external: true
 ```
 
 ### Proxy specific files
@@ -77,7 +70,6 @@ probe_image_sizes:
     - name: El Primo
       match: ^.+/(?=Primo-[^/]+$)
       target: /home/demo/Primo/pics/
-      external: true
 ```
 
 ### Proxy fallbacks
@@ -90,12 +82,11 @@ probe_image_sizes:
   proxies:
     - name: Example
       match: ^.+/(?=[^/]+$)
-      target: /images/
+      target: images/
     # when proxy above failed to target a parsable image.
     - name: All images folder
       match: ^.+/(?=[^/]+$)
       target: /a/path/expected/to/contain/all/images/
-      external: true
     # Use original image path if all previous ones failed.
     - name: Original
       # Match all, as all paths contain the empty string.
