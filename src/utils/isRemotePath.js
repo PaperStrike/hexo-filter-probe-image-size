@@ -1,4 +1,4 @@
-const remoteRegex = /^(https?:)\/\//;
+const remoteRegex = new RegExp('(^https?:)?//');
 
 /**
  * @param {string} path
