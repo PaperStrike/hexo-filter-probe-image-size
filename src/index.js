@@ -1,17 +1,18 @@
 /* global hexo */
 const fs = require('fs');
+const path = require('path');
 const chalk = require('chalk');
 const probe = require('probe-image-size');
 const replaceAsync = require('string-replace-async');
 
 const Attrs = require('./utils/Attrs');
+const isRemotePath = require('./utils/isRemotePath');
 
 /**
  * @typedef {Object} ProxyInit
  * @property {string} [name]
  * @property {string} match
  * @property {string} target
- * @property {string} [external]
  */
 
 /**
@@ -31,8 +32,7 @@ const config = {
     {
       name: 'HTTP to local',
       match: '^(https?:)?//.+/(?=[^/]+$)',
-      target: '/images/',
-      external: false,
+      target: 'images/',
     },
   ],
 };
@@ -54,20 +54,18 @@ const probeResolvedPathPromises = {};
 
 /**
  * @param {string} resolvedPath
- * @param {Object} [options]
- * @param {boolean} [options.external=false]
  * @return {Promise<probe.ProbeResult>}
  */
-const probeByResolvedPath = (resolvedPath, { external = false } = {}) => {
+const probeByResolvedPath = (resolvedPath) => {
   if (probeResolvedPathPromises[resolvedPath]) {
     return probeResolvedPathPromises[resolvedPath];
   }
 
   /** @type Promise<probe.ProbeResult> */
   let probePromise;
-  if (/^https?:\/\//.test(resolvedPath)) {
+  if (isRemotePath(resolvedPath)) {
     probePromise = probe(resolvedPath);
-  } else if (external) {
+  } else if (path.isAbsolute(resolvedPath)) {
     probePromise = probe(fs.createReadStream(resolvedPath));
   } else {
     const fileStream = hexo.route.get(resolvedPath);
@@ -90,33 +88,34 @@ const probeByResolvedPath = (resolvedPath, { external = false } = {}) => {
 /**
  * @type {Object<string, Promise<probe.ProbeResult>>}
  */
-const probeSRCPromises = {};
+const probeSourcePromises = {};
 
 /**
  * @param {string} src
  * @return {Promise<probe.ProbeResult>}
  */
 const probeByElementSRC = (src) => {
-  if (probeSRCPromises[src]) return probeSRCPromises[src];
+  const source = isRemotePath(src) ? src : hexo.route.format(src);
+  if (probeSourcePromises[source]) return probeSourcePromises[source];
 
   let probePromise;
   {
-    const matchedProxies = proxies.filter((proxy) => proxy.match.test(src));
+    const matchedProxies = proxies.filter((proxy) => proxy.match.test(source));
 
     if (matchedProxies.length === 0) {
-      probePromise = probeByResolvedPath(src);
+      probePromise = probeByResolvedPath(source);
     } else {
       probePromise = matchedProxies
         .reduce((promise, proxy) => (
           promise.catch(() => {
-            const resolvedPath = src.replace(proxy.match, proxy.target);
-            return probeByResolvedPath(resolvedPath, { external: proxy.external });
+            const resolvedPath = source.replace(proxy.match, proxy.target);
+            return probeByResolvedPath(resolvedPath);
           })
         ), Promise.reject());
     }
   }
 
-  probeSRCPromises[src] = probePromise;
+  probeSourcePromises[source] = probePromise;
   return probePromise;
 };
 
