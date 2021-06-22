@@ -58,7 +58,7 @@ const probeResolvedPathPromises = {};
  * @param {boolean} [options.external=false]
  * @return {Promise<probe.ProbeResult>}
  */
-const probeByResolvedPath = async (resolvedPath, { external = false } = {}) => {
+const probeByResolvedPath = (resolvedPath, { external = false } = {}) => {
   if (probeResolvedPathPromises[resolvedPath]) {
     return probeResolvedPathPromises[resolvedPath];
   }
