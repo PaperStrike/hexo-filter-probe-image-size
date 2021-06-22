@@ -7,7 +7,7 @@ const replaceAsync = require('string-replace-async');
 const Attrs = require('./utils/Attrs');
 
 /**
- * @typedef {Object} PathProxy
+ * @typedef {Object} ProxyInit
  * @property {string} [name]
  * @property {string} match
  * @property {string} target
@@ -15,10 +15,14 @@ const Attrs = require('./utils/Attrs');
  */
 
 /**
- * @namespace
+ * @typedef {Object} Config
  * @property {boolean} enable
  * @property {number} priority
- * @property {PathProxy[]} proxies
+ * @property {Array<ProxyInit>} proxies
+ */
+
+/**
+ * @type {Config}
  */
 const config = {
   enable: false,
@@ -37,6 +41,11 @@ const config = {
   const hexoConfigKey = 'probe_image_sizes';
   hexo.config[hexoConfigKey] = Object.assign(config, hexo.config[hexoConfigKey]);
 }
+
+const proxies = config.proxies.map((proxy) => ({
+  ...proxy,
+  match: new RegExp(proxy.match),
+}));
 
 /**
  * @type {Object<string, Promise<probe.ProbeResult>>}
@@ -92,18 +101,18 @@ const probeByElementSRC = (src) => {
 
   let probePromise;
   {
-    const proxies = config.proxies.filter((proxy) => new RegExp(proxy.match).test(src));
+    const matchedProxies = proxies.filter((proxy) => proxy.match.test(src));
 
-    if (proxies.length === 0) {
+    if (matchedProxies.length === 0) {
       probePromise = probeByResolvedPath(src);
     } else {
-      probePromise = proxies
-        .reduce((promise, proxy) => {
-          const resolvedPath = src.replace(new RegExp(proxy.match), proxy.target);
-          return promise.catch(() => (
-            probeByResolvedPath(resolvedPath, { external: proxy.external })
-          ));
-        }, Promise.reject());
+      probePromise = matchedProxies
+        .reduce((promise, proxy) => (
+          promise.catch(() => {
+            const resolvedPath = src.replace(proxy.match, proxy.target);
+            return probeByResolvedPath(resolvedPath, { external: proxy.external });
+          })
+        ), Promise.reject());
     }
   }
 
