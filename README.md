@@ -40,7 +40,6 @@ probe_image_sizes:
 
       # The string that replaces the substring
       # specified by the match above.
-      # Based on the generating folder.
       target: images/
 ```
 
