@@ -39,7 +39,7 @@ probe_image_sizes:
       match: ^(https?:)?//.+/(?=[^/]+$)
 
       # The string that replaces the substring
-      # specified by the specified RegExp.
+      # specified by the match above.
       # Based on the generating folder.
       target: images/
 ```
