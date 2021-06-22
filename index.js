@@ -6,10 +6,10 @@ const replaceAsync = require('string-replace-async');
 
 /**
  * @typedef {Object} PathProxy
- * @property {string} name
+ * @property {string} [name]
  * @property {string} match
  * @property {string} target
- * @property {string} external
+ * @property {string} [external]
  */
 
 /**
@@ -132,19 +132,15 @@ class Attrs {
 
 const getSizedStringAttrs = async (stringAttrs) => {
   const attrs = new Attrs(stringAttrs);
+  const { src } = attrs;
 
-  if (!('src' in attrs) || 'loading' in attrs) return stringAttrs;
+  if (!src || 'width' in attrs || 'height' in attrs) return stringAttrs;
 
-  if (!('width' in attrs) && !('height' in attrs)) {
-    const { src } = attrs;
-    if (src) {
-      const size = await probeByElementSRC(src).catch(() => null);
-      if (size) {
-        attrs.width = size.width;
-        attrs.height = size.height;
-      }
-    }
-  }
+  const size = await probeByElementSRC(src).catch(() => null);
+  if (!size) return stringAttrs;
+
+  attrs.width = size.width;
+  attrs.height = size.height;
 
   return attrs.toString();
 };
