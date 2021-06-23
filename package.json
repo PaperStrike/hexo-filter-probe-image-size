@@ -1,6 +1,6 @@
 {
   "name": "hexo-filter-probe-image-size",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Probe and set image sizes in hexo web pages",
   "keywords": [
     "hexo",
