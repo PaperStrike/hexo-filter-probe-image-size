@@ -86,15 +86,25 @@ probe_image_size:
     - name: HTTP to local
       match: ^(https?:)?//.+/(?=[^/]+$)
       target: images/
-    # when proxy above failed to target a parsable image.
+    # When proxy above failed to target a parsable image.
     - name: All images folder
       match: ^.+/(?=[^/]+$)
       target: /a/path/expected/to/contain/all/images/
-    # Use original image path if all previous ones failed.
-    - name: Original
+    # When above failed, too.
+    - name: Try Original
       # Match all, as all paths contain the empty string.
       match: ''
       target: ''
+```
+
+### No proxy
+
+Use the original path directly:
+
+```yaml
+probe_image_size:
+  enable: true
+  proxies: []
 ```
 
 ### Run later than others
