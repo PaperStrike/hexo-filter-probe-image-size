@@ -83,8 +83,8 @@ For files failed to access in previous proxy, use `/a/path/expected/to/contain/a
 probe_image_size:
   enable: true
   proxies:
-    - name: Example
-      match: ^.+/(?=[^/]+$)
+    - name: HTTP to local
+      match: ^(https?:)?//.+/(?=[^/]+$)
       target: images/
     # when proxy above failed to target a parsable image.
     - name: All images folder
