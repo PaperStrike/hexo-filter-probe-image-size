@@ -13,6 +13,7 @@
   "license": "MIT",
   "author": "PaperStrike",
   "files": [
+    "src",
     "*.config.*",
     ".eslintrc.*"
   ],
