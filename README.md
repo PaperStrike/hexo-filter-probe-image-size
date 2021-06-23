@@ -6,6 +6,10 @@ Probe and set `width` and `height` to `<img>` elements.
 
 As [modern best practice - Optimize Cumulative Layout Shift | web.dev](https://web.dev/optimize-cls/#modern-best-practice) describes, developers should always set the `width` and `height` attributes without units in HTML, and set one of them to `auto` in CSS.
 
+Core: [nodeca/probe-image-size](https://github.com/nodeca/probe-image-size).
+
+---
+
 🐿️ Jump to [Examples](#examples), [Q&A][q-a], or [Contributing Guide][contributing].
 
 ## Usage
