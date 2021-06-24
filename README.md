@@ -16,10 +16,6 @@ Core: [nodeca/probe-image-size](https://github.com/nodeca/probe-image-size).
 
 Available configurations and default values. Configure them in Hexo `_config.yml`.
 
-All relative paths, relative and limited to the generating folder (usually the `public` folder after generated).
-
-All absolute paths represent files from the file system. E.g., `/home/foo/Pictures/` does represent `/home/foo/Pictures/` on Linux, and `D:/home/foo/Pictures/` on Windows (assume you run Hexo in `D:`), instead of the one based on your site folder.
-
 ```yaml
 # Probe <img> sizes and set related attributes.
 probe_image_size:
@@ -47,6 +43,12 @@ probe_image_size:
       target: images/
 ```
 
+When parsing an `<img>`'s `src` attribute, this filter firstly checks if the path matches `^(https?:)?//`. If not, will format it to a _relative_ path that has no query string.
+
+By using _proxies_, you can resolve these grabbed and possibly formatted paths back to _absolute_ paths. Proxy-resolved absolute paths represent files from the file system. E.g., `/home/foo/Pictures/` does represent `/home/foo/Pictures/` on POSIX, and `D:/home/foo/Pictures/` on Windows (assume you run Hexo in `D:`), instead of the one based on the generating folder.
+
+The whole process won't mutate the `src` attribute.
+
 ## Examples
 
 ### Proxy specific URL
@@ -64,7 +66,7 @@ probe_image_size:
 
 ### Proxy specific files
 
-For files with a name prefixed by `Primo-`, use `/home/demo/Primo/pics/`:
+For files with a name prefixed by `Primo-`, use `D:/Primo/pics/`:
 
 ```yaml
 probe_image_size:
@@ -72,7 +74,7 @@ probe_image_size:
   proxies:
     - name: El Primo
       match: ^.+/(?=Primo-[^/]+$)
-      target: /home/demo/Primo/pics/
+      target: D:/Primo/pics/
 ```
 
 ### Proxy fallbacks
