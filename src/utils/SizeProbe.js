@@ -47,11 +47,13 @@ class SizeProbe {
   }
 
   /**
-   * @param {string} source
+   * @param {string} src
    * @param {Array<{match: RegExp, target: string}>} proxies
    * @return {Promise<probe.ProbeResult>}
    */
-  probeFromSource(source, proxies) {
+  probeFromSRC(src, proxies) {
+    const source = isRemotePath(src) ? src : this.hexo.route.format(src);
+
     if (this.probes[source]) return this.probes[source];
 
     /** @type Promise<probe.ProbeResult> */

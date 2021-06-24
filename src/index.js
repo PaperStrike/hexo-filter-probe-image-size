@@ -3,7 +3,6 @@ const replaceAsync = require('string-replace-async');
 
 const Attrs = require('./utils/Attrs');
 const SizeProbe = require('./utils/SizeProbe');
-const isRemotePath = require('./utils/isRemotePath');
 
 /**
  * @typedef {Object} ProxyInit
@@ -39,7 +38,7 @@ const config = {
   hexo.config[hexoConfigKey] = Object.assign(config, hexo.config[hexoConfigKey]);
 }
 
-let probeSizeFromSource;
+let probeSizeFromSRC;
 {
   const proxies = config.proxies.map((proxy) => ({
     ...proxy,
@@ -47,7 +46,7 @@ let probeSizeFromSource;
   }));
 
   const sizeProbe = new SizeProbe(hexo);
-  probeSizeFromSource = (source) => sizeProbe.probeFromSource(source, proxies);
+  probeSizeFromSRC = (src) => sizeProbe.probeFromSRC(src, proxies);
 }
 
 const getSizedStringAttrs = async (stringAttrs) => {
@@ -56,8 +55,7 @@ const getSizedStringAttrs = async (stringAttrs) => {
 
   if (!src || 'width' in attrs || 'height' in attrs) return stringAttrs;
 
-  const source = isRemotePath(src) ? src : hexo.route.format(src);
-  const size = await probeSizeFromSource(source).catch(() => null);
+  const size = await probeSizeFromSRC(src).catch(() => null);
   if (!size) return stringAttrs;
 
   attrs.width = size.width;
