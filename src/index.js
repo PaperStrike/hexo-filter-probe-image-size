@@ -1,11 +1,8 @@
 /* global hexo */
-const fs = require('fs');
-const path = require('path');
-const chalk = require('chalk');
-const probe = require('probe-image-size');
 const replaceAsync = require('string-replace-async');
 
 const Attrs = require('./utils/Attrs');
+const SizeProbe = require('./utils/SizeProbe');
 const isRemotePath = require('./utils/isRemotePath');
 
 /**
@@ -42,82 +39,16 @@ const config = {
   hexo.config[hexoConfigKey] = Object.assign(config, hexo.config[hexoConfigKey]);
 }
 
-const proxies = config.proxies.map((proxy) => ({
-  ...proxy,
-  match: new RegExp(proxy.match),
-}));
+let probeSizeFromSource;
+{
+  const proxies = config.proxies.map((proxy) => ({
+    ...proxy,
+    match: new RegExp(proxy.match),
+  }));
 
-/**
- * @type {Object<string, Promise<probe.ProbeResult>>}
- */
-const probeResolvedPathPromises = {};
-
-/**
- * @param {string} resolvedPath
- * @return {Promise<probe.ProbeResult>}
- */
-const probeByResolvedPath = (resolvedPath) => {
-  if (probeResolvedPathPromises[resolvedPath]) {
-    return probeResolvedPathPromises[resolvedPath];
-  }
-
-  /** @type Promise<probe.ProbeResult> */
-  let probePromise;
-  if (isRemotePath(resolvedPath)) {
-    probePromise = probe(resolvedPath);
-  } else if (path.isAbsolute(resolvedPath)) {
-    probePromise = probe(fs.createReadStream(resolvedPath));
-  } else {
-    const fileStream = hexo.route.get(resolvedPath);
-    probePromise = fileStream ? probe(hexo.route.get(resolvedPath)) : Promise.reject();
-  }
-  probePromise = probePromise
-    .then((result) => {
-      hexo.log.info('Probed image: %s', chalk.magentaBright(resolvedPath));
-      return result;
-    })
-    .catch((e) => {
-      hexo.log.info('Probe image failed: %s', chalk.yellow(resolvedPath));
-      throw e;
-    });
-
-  probeResolvedPathPromises[resolvedPath] = probePromise;
-  return probePromise;
-};
-
-/**
- * @type {Object<string, Promise<probe.ProbeResult>>}
- */
-const probeSourcePromises = {};
-
-/**
- * @param {string} src
- * @return {Promise<probe.ProbeResult>}
- */
-const probeByElementSRC = (src) => {
-  const source = isRemotePath(src) ? src : hexo.route.format(src);
-  if (probeSourcePromises[source]) return probeSourcePromises[source];
-
-  let probePromise;
-  {
-    const matchedProxies = proxies.filter((proxy) => proxy.match.test(source));
-
-    if (matchedProxies.length === 0) {
-      probePromise = probeByResolvedPath(source);
-    } else {
-      probePromise = matchedProxies
-        .reduce((promise, proxy) => (
-          promise.catch(() => {
-            const resolvedPath = source.replace(proxy.match, proxy.target);
-            return probeByResolvedPath(resolvedPath);
-          })
-        ), Promise.reject());
-    }
-  }
-
-  probeSourcePromises[source] = probePromise;
-  return probePromise;
-};
+  const sizeProbe = new SizeProbe(hexo);
+  probeSizeFromSource = (source) => sizeProbe.probeFromSource(source, proxies);
+}
 
 const getSizedStringAttrs = async (stringAttrs) => {
   const attrs = new Attrs(stringAttrs);
@@ -125,7 +56,8 @@ const getSizedStringAttrs = async (stringAttrs) => {
 
   if (!src || 'width' in attrs || 'height' in attrs) return stringAttrs;
 
-  const size = await probeByElementSRC(src).catch(() => null);
+  const source = isRemotePath(src) ? src : hexo.route.format(src);
+  const size = await probeSizeFromSource(source).catch(() => null);
   if (!size) return stringAttrs;
 
   attrs.width = size.width;
