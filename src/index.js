@@ -27,7 +27,7 @@ const config = {
   proxies: [
     {
       name: 'HTTP to local',
-      match: '^(https?:)?//.+/(?=[^/]+$)',
+      match: '^(https?:)?//.+/',
       target: 'images/',
     },
   ],
