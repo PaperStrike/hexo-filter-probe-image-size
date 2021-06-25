@@ -36,7 +36,7 @@ probe_image_size:
 
       # A regex or string used to specify substrings
       # that are replaced with the specified target string.
-      match: ^(https?:)?//.+/(?=[^/]+$)
+      match: ^(https?:)?//.+/
 
       # The string that replaces the substring
       # specified by the match above.
@@ -86,11 +86,11 @@ probe_image_size:
   enable: true
   proxies:
     - name: HTTP to local
-      match: ^(https?:)?//.+/(?=[^/]+$)
+      match: ^(https?:)?//.+/
       target: images/
     # When proxy above failed to target a parsable image.
     - name: All images folder
-      match: ^.+/(?=[^/]+$)
+      match: ^.+/
       target: /a/path/expected/to/contain/all/images/
     # When above failed, too.
     - name: Try Original
