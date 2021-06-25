@@ -5,7 +5,7 @@ const Attrs = require('./utils/Attrs');
 const SizeProbe = require('./utils/SizeProbe');
 
 /**
- * @typedef {Object} ProxyInit
+ * @typedef {Object} Config.SourceProxy
  * @property {string} [name]
  * @property {string} match
  * @property {string} target
@@ -15,7 +15,7 @@ const SizeProbe = require('./utils/SizeProbe');
  * @typedef {Object} Config
  * @property {boolean} enable
  * @property {number} priority
- * @property {Array<ProxyInit>} proxies
+ * @property {Array<Config.SourceProxy>} proxies
  */
 
 /**
@@ -38,16 +38,7 @@ const config = {
   hexo.config[hexoConfigKey] = Object.assign(config, hexo.config[hexoConfigKey]);
 }
 
-let probeSizeFromSRC;
-{
-  const proxies = config.proxies.map((proxy) => ({
-    ...proxy,
-    match: new RegExp(proxy.match),
-  }));
-
-  const sizeProbe = new SizeProbe(hexo);
-  probeSizeFromSRC = (src) => sizeProbe.probeFromSRC(src, proxies);
-}
+const sizeProbe = new SizeProbe(hexo, config.proxies);
 
 const getSizedStringAttrs = async (stringAttrs) => {
   const attrs = new Attrs(stringAttrs);
@@ -55,7 +46,7 @@ const getSizedStringAttrs = async (stringAttrs) => {
 
   if (!src || 'width' in attrs || 'height' in attrs) return stringAttrs;
 
-  const size = await probeSizeFromSRC(src).catch(() => null);
+  const size = await sizeProbe.probeFromSRC(src).catch(() => null);
   if (!size) return stringAttrs;
 
   attrs.width = size.width;

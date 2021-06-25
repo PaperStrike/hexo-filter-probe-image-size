@@ -5,14 +5,35 @@ const chalk = require('chalk');
 
 const isRemotePath = require('./isRemotePath');
 
+/**
+ * @typedef {Object} SourceProxy
+ * @property {RegExp} match
+ * @property {string} target
+ */
+
 class SizeProbe {
   probes = {};
 
   /**
-   * @param {import(hexo).Hexo} hexo
+   * @type {import(hexo).Hexo}
    */
-  constructor(hexo) {
+  hexo;
+
+  /**
+   * @type {Array<SourceProxy>}
+   */
+  proxies;
+
+  /**
+   * @param {import(hexo).Hexo} hexo
+   * @param {Iterable<Config.SourceProxy>} proxyInitList
+   */
+  constructor(hexo, proxyInitList) {
     this.hexo = hexo;
+    this.proxies = [...proxyInitList].map((proxy) => ({
+      ...proxy,
+      match: new RegExp(proxy.match),
+    }));
   }
 
   /**
@@ -48,10 +69,9 @@ class SizeProbe {
 
   /**
    * @param {string} src
-   * @param {Array<{match: RegExp, target: string}>} proxies
    * @return {Promise<probe.ProbeResult>}
    */
-  probeFromSRC(src, proxies) {
+  probeFromSRC(src) {
     const source = isRemotePath(src) ? src : this.hexo.route.format(src);
 
     if (this.probes[source]) return this.probes[source];
@@ -59,7 +79,7 @@ class SizeProbe {
     /** @type Promise<probe.ProbeResult> */
     let probePromise;
     {
-      const matchedProxies = proxies.filter((proxy) => proxy.match.test(source));
+      const matchedProxies = this.proxies.filter((proxy) => proxy.match.test(source));
 
       if (matchedProxies.length === 0) {
         probePromise = this.probeFromResolvedURI(source);
