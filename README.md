@@ -43,11 +43,11 @@ probe_image_size:
       target: images/
 ```
 
-When parsing an `<img>`'s `src` attribute, this filter firstly checks if the path matches `^(https?:)?//`. If not, will format it to a _relative_ path that has no query string.
+When resolving an image path (usually grabbed from `<img>`s' `src` attributes), this filter firstly checks if the path matches `^(https?:)?//`. If not, will format it to a _relative_ path that has no query string.
 
-By using _proxies_, you can resolve these grabbed and possibly formatted paths back to _absolute_ paths. Proxy-resolved absolute paths represent files from the file system. E.g., `/home/foo/Pictures/` does represent `/home/foo/Pictures/` on POSIX, and `D:/home/foo/Pictures/` on Windows (assume you run Hexo in `D:`), instead of the one based on the generating folder.
+By using _proxies_, you can resolve these possibly formatted paths back to _absolute_ paths. Proxy-resolved absolute paths represent files from the file system. E.g., `/home/foo/Pictures/` does represent `/home/foo/Pictures/` on POSIX, and `D:/home/foo/Pictures/` on Windows (assume you run Hexo in `D:`), instead of the one based on the generating folder.
 
-The whole process won't mutate the `src` attribute.
+The whole process won't mutate any original `src` values.
 
 ## Examples
 
